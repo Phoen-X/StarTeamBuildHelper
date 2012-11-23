@@ -1,5 +1,7 @@
 package ua.sitronics.AutoBuilder;
 
+import ua.sitronics.AutoBuilder.Ant.AntRunner;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -8,19 +10,20 @@ import java.io.IOException;
  */
 public class ProjectBuilder
 {
-	String projectName;
+	private String projectName;
+    private File projectDir;
+    private File buildDir = new File("C:\\1");
 
-	public ProjectBuilder(String projectName)
-	{
-		this.projectName = projectName;
-	}
+    public ProjectBuilder(String projectName, File projectDir)
+    {
+        this.projectName = projectName;
+        this.projectDir = projectDir;
+    }
 
-	public File build() throws IOException
+    public File build() throws IOException
 	{
-		File projectDir = new File("C:\\ST Working folder\\MTSU-BSCS6 support\\Sources\\jrm\\app");
-		File buildDir = new File("C:\\1");
-		File moduleDir = new File(projectDir, "webvat");
-		AntLauncher antRunner = new AntLauncher(moduleDir, buildDir);
+		File moduleDir = new File(projectDir, projectName);
+		AntRunner antRunner = new AntRunner(moduleDir, buildDir);
 		File build = antRunner.runBuild();
 		System.out.println("Build Created. File: " + build.getAbsolutePath());
 		return build;
