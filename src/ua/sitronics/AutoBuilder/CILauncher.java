@@ -2,6 +2,7 @@ package ua.sitronics.AutoBuilder;
 
 import ua.sitronics.AutoBuilder.CI.CIListItem;
 import ua.sitronics.AutoBuilder.CI.CIListProcessor;
+import ua.sitronics.AutoBuilder.Exception.ComponentNotFoundException;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 public class CILauncher
 {
 
-    public static void main(String[] args) throws IOException
+    public static void main(String[] args) throws IOException, ComponentNotFoundException
     {
         CIListProcessor processor = new CIListProcessor(new File("D:/VM/Temp/CI List.xls"));
 
@@ -25,5 +26,8 @@ public class CILauncher
         {
             component.setHistory(processor.getHistory(component.getComponentName()));
         }
+
+        double newVersion = processor.indentVersion("timm2txt", "test changes", "I did");
+        processor.saveBook();
     }
 }

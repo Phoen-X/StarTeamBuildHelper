@@ -6,7 +6,9 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Created by IntelliJ IDEA. User: Admin Date: 23.11.12 17:13
+ * Created by IntelliJ IDEA.
+ * User: Admin
+ * Date: 23.11.12 17:13
  */
 public class ProjectBuilder
 {

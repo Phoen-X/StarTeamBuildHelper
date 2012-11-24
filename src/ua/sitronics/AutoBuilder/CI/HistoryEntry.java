@@ -46,14 +46,14 @@ public class HistoryEntry
         RowProcessor rdr = new RowProcessor(row);
         try
         {
-            this.setDate(rdr.getDateCell(0));
+            this.setDate(rdr.getDateCell(HistoryMap.DATE));
         }
         finally
         {
-            this.setComponent(rdr.getCell(1))
-                .setPerson(rdr.getCell(2))
-                .setNewVersion(Double.valueOf(rdr.getCell(3)))
-                .setChanges(rdr.getCell(4));
+            this.setComponent(rdr.getCell(HistoryMap.COMPONENT))
+                .setPerson(rdr.getCell(HistoryMap.CHANGED_BY))
+                .setNewVersion(Double.valueOf(rdr.getCell(HistoryMap.VERSION)))
+                .setChanges(rdr.getCell(HistoryMap.CHANGES));
         }
 
     }

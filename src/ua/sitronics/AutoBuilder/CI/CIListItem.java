@@ -38,14 +38,14 @@ public class CIListItem
     {
         RowProcessor rdr = new RowProcessor(row);
 
-        this.setComponentName(rdr.getCell(0))
-                .setVersion(Double.valueOf(rdr.getCell(1)))
-                .setResponsible(rdr.getCell(2))
-                .setDescription(rdr.getCell(3))
-                .setCvsPath(rdr.getCell(4))
-                .setStarTeamPath(rdr.getCell(5))
-                .setBuildFile(rdr.getCell(6))
-                .setBuildFileType(rdr.getCell(7));
+        this.setComponentName(rdr.getCell(MainSheetMap.COMPONENT))
+                .setVersion(Double.valueOf(rdr.getCell(MainSheetMap.VERSION)))
+                .setResponsible(rdr.getCell(MainSheetMap.RESPONSIBLE))
+                .setDescription(rdr.getCell(MainSheetMap.DESCRIPTION))
+                .setCvsPath(rdr.getCell(MainSheetMap.CVS_PATH))
+                .setStarTeamPath(rdr.getCell(MainSheetMap.ST_PATH))
+                .setBuildFile(rdr.getCell(MainSheetMap.VERSION_FILE))
+                .setBuildFileType(rdr.getCell(MainSheetMap.VERSION_FILE_TYPE));
     }
 
     public String getComponentName()

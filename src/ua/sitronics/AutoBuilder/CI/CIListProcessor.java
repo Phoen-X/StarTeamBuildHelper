@@ -2,10 +2,10 @@ package ua.sitronics.AutoBuilder.CI;
 
 import org.apache.poi.hssf.usermodel.*;
 import sun.plugin.dom.exception.WrongDocumentException;
+import ua.sitronics.AutoBuilder.Exception.ComponentNotFoundException;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,6 +22,10 @@ public class CIListProcessor
     //default sheet names
     private String ciMainSheetName = "ci list";
     private String versionSheetName = "versions history";
+
+    // start positions
+    private int mainStarRow = 1;
+    private int historyStartRow = 1;
 
     public CIListProcessor(File ciFile) throws IOException
     {
@@ -68,14 +72,27 @@ public class CIListProcessor
         return components;
     }
 
+    public CIListItem getComponentForName(String component) throws ComponentNotFoundException
+    {
+        int rowNum = 1;
+        HSSFRow row;
+        while ((row = mainSheet.getRow(rowNum++)) != null)
+        {
+            CIListItem item = new CIListItem(row);
+            if (item.getComponentName().equalsIgnoreCase(component))
+                return item;
+        }
+        throw new ComponentNotFoundException(component);
+    }
+
 
     public ArrayList<HistoryEntry> getHistory(String componentName)
     {
         ArrayList<HistoryEntry> history = new ArrayList<HistoryEntry>(500);
-        for(int rowNum = 1; rowNum < historySheet.getLastRowNum(); rowNum++)
+        for(int rowNum = historyStartRow; rowNum < historySheet.getLastRowNum(); rowNum++)
         {
             HSSFRow row = historySheet.getRow(rowNum);
-            if(row == null || row.getCell(0) == null)
+            if(row == null || row.getCell(HistoryMap.COMPONENT) == null)
                 break;
 
             try
@@ -115,5 +132,61 @@ public class CIListProcessor
         stream.flush();
         stream.close();
 
+    }
+
+    private void addHistoryInfo(String component, double version, String changes, String who)
+    {
+        HistoryEntry entry = new HistoryEntry().setComponent(component).setNewVersion(version)
+                                               .setChanges(changes).setPerson(who);
+        // setting default values
+        entry.setDate(new Date(System.currentTimeMillis()));
+        int rowNum = historySheet.getLastRowNum();
+        HSSFRow row = historySheet.createRow(rowNum + 1);
+
+        HSSFCell cell = row.createCell(0); // date
+        cell.setCellValue(entry.getDate());
+
+        cell = row.createCell(1); //component
+        cell.setCellValue(entry.getComponent());
+
+        cell = row.createCell(2); // person who did changes
+        cell.setCellValue(entry.getPerson());
+
+        cell = row.createCell(3); // Version
+        cell.setCellValue(entry.getNewVersion().toString().replace(",", "."));
+
+        cell = row.createCell(4);              // Changes
+        cell.setCellValue(entry.getChanges());
+    }
+
+    public double indentVersion(String component, String changes, String person) throws ComponentNotFoundException
+    {
+        CIListItem mainEntry = getComponentForName(component);
+
+        Double newVersion = mainEntry.getVersion() + 0.01;
+
+        addHistoryInfo(component, newVersion, changes, person);
+
+        int componentRow = getComponentRowNum(component);
+
+        HSSFRow componentMainRow = mainSheet.getRow(componentRow);
+
+        componentMainRow.getCell(MainSheetMap.VERSION).setCellValue(newVersion.toString().replace(",", "."));
+
+        return newVersion;
+    }
+
+    private int getComponentRowNum(String component) throws ComponentNotFoundException
+    {
+        int rowNum = mainStarRow;
+        HSSFRow row;
+        while ((row = mainSheet.getRow(rowNum)) != null)
+        {
+            if(row.getCell(MainSheetMap.COMPONENT).getStringCellValue().equalsIgnoreCase(component))
+                return rowNum;
+            rowNum++;
+        }
+
+        throw new ComponentNotFoundException(component);
     }
 }
